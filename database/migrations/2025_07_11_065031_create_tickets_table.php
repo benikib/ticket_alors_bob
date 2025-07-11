@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('conctat');
             $table->string('code')->unique();
             $table->boolean('used')->default(false);
+            $table->boolean('vip')->default(false);
             $table->timestamps();
         });
     }

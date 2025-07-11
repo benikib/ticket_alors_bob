@@ -4,23 +4,37 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use Str;
 
 class TicketController extends Controller
 {
     public function index(){
-        $ticket = Ticket::all();
-         return response()->json($ticket);
+       try {
+            $tickets = Ticket::all();
+            return response()->json($tickets);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
     }
      public function store(Request $request)
     {
-        $ticket = Ticket::create([
+
+        try{
+             $ticket = Ticket::create([
             'nom' => $request->nom,
             'conctat' => $request->conctat,
             'n_billet' => $request->n_billet,
+            'vip' =>$request->vip ?? false,
             'code' => 'BILLET-' . strtoupper(Str::random(10)),
         ]);
 
-        return response()->json($ticket);
+        return response()->json([
+            'code' => $ticket->code
+        ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
+
     }
 
     public function verify(Request $request)
