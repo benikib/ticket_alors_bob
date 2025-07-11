@@ -19,22 +19,27 @@ class TicketController extends Controller
      public function store(Request $request)
     {
 
-        try{
-             $ticket = Ticket::create([
-            'nom' => $request->nom,
-            'conctat' => $request->conctat,
-            'n_billet' => $request->n_billet,
-            'vip' =>$request->vip ?? false,
-            'code' => 'BILLET-' . strtoupper(Str::random(10)),
-        ]);
-
-        return response()->json([
-            'code' => $ticket->code
-        ]);
+        try {
+            
+            $now = time(); 
+            $start1978 = strtotime('1978-01-01 00:00:00'); 
+            $secondsSince1978 = $now - $start1978;
+            $code = 'Ticket-' . $secondsSince1978;
+    
+            $ticket = Ticket::create([
+                'nom'      => $request->nom,
+                'conctat'  => $request->conctat,
+                'n_billet' => $request->n_billet,
+                'vip'      => $request->vip, 
+                'code'     => $code,
+            ]);
+    
+            return response()->json([
+                'code' => $ticket->code
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
     }
 
     public function verify(Request $request)
