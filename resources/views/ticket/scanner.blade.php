@@ -120,7 +120,6 @@
                 result.innerHTML="Acces refuse"
                 result.classList.add("bg-red-600", "p-5");
             }
-            html5QrCode.stop().then(() => html5QrCode.clear());
           })
           .catch(error => {
             console.error("Erreur lors de l'appel à Laravel :", error);
