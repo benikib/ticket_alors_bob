@@ -16,47 +16,62 @@ class TicketController extends Controller
             return response()->json(['error' => $e->getMessage()]);
         }
     }
-     public function store(Request $request)
-    {
+   public function store(Request $request)
+{
+    try {
+        $rawCode = 'BILLET-' . strtoupper(Str::random(10));
 
-        try{
-             $ticket = Ticket::create([
+        $ticket = Ticket::create([
             'nom' => $request->nom,
             'conctat' => $request->conctat,
             'n_billet' => $request->n_billet,
-            'vip' =>$request->vip ?? false,
-            'code' => 'BILLET-' . strtoupper(Str::random(10)),
+            'vip' => $request->vip ?? false,
+            'code' => Hash::make($rawCode), // stocke le hash
         ]);
 
         return response()->json([
-            'code' => $ticket->code
+            'code' => $rawCode // retourne le code lisible au client
         ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()]);
-        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()]);
+    }
+}
 
+
+
+
+public function verify(Request $request)
+{
+    $tickets = Ticket::where('used', false)->get();
+
+    foreach ($tickets as $ticket) {
+        if (Hash::check($request->code, $ticket->code)) {
+            if ($ticket->n_billet > 1) {
+                // On décrémente le nombre de billets restants
+                $ticket->decrement('n_billet');
+            } else {
+                // C'est le dernier billet, on désactive le ticket
+                $ticket->update([
+                    'used' => true,
+                    'n_billet' => 0
+                ]);
+            }
+
+            return response()->json([
+                  'valid' => true,
+                'nom' => $ticket->nom,
+                'conctat' => $ticket->conctat,
+                'n_billet' => $ticket->n_billet,
+                'vip' => $ticket->vip,
+                'message' => $ticket->n_billet === 0 ? 'Dernier billet utilisé' : 'Billet validé'
+            ]);
+        }
     }
 
-    public function verify(Request $request)
-    {
-        $ticket = Ticket::where('code', $request->code)->first();
+    return response()->json([
+           'valid' => false,
+        'message' => 'Code invalide ou déjà utilisé'
+    ]);
+}
 
-        if (!$ticket) {
-            return response()->json(['valid' => false, 'message' => 'Invalide']);
-        }
-
-        if ($ticket->used) {
-            return response()->json(['valid' => false, 'message' => 'Déjà utilisé']);
-        }
-
-        $ticket->update(['used' => true]);
-
-        return response()->json([
-            'valid' => true,
-            'nom' => $ticket->nom,
-            'conctat' => $ticket->conctat,
-            'conctat' => $request->conctat,
-            'n_billet' => $request->n_billet,
-        ]);
-    }
 }
