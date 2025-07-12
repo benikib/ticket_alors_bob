@@ -12,7 +12,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start py-10 space-y-6">
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start  space-y-6">
 
   <header class="bg-orange-600 text-white p-4 shadow flex justify-between items-center flex-wrap gap-2 w-full">
     <a href="{{ route('ticket.index') }}" 
