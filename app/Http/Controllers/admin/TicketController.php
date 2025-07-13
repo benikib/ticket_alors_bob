@@ -15,6 +15,12 @@ class TicketController extends Controller
         return View("ticket.index",["tickets"=>$tickets]);
         
      }
+     public function calculNumerobillet(){
+        $now = time(); 
+        $start1978 = strtotime('1978-01-01 00:00:00'); 
+        $secondsSince1978 = $now - $start1978;
+        return 'Ticket-' . $secondsSince1978 . '-' . uniqid();
+    }
      public function store(Request $request)
     {
 
@@ -23,7 +29,8 @@ class TicketController extends Controller
             $now = time(); 
             $start1978 = strtotime('1978-01-01 00:00:00'); 
             $secondsSince1978 = $now - $start1978;
-            $code = 'Ticket-' . $secondsSince1978;
+    
+            $code = 'Ticket-' . $request->nom . '-' . $secondsSince1978 . '-' . uniqid();
     
             $ticket = Ticket::create([
                 'nom'      => $request->nom,
@@ -32,7 +39,7 @@ class TicketController extends Controller
                 'vip'      => $request->vip, 
                 'code'     => $code,
             ]);
-    
+
             return redirect()->route('ticket.index');
 
         } catch (\Exception $e) {

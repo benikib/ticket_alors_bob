@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Ticket;
 use Str;
 
+
 class TicketController extends Controller
 {
+
     public function index(){
        try {
             $tickets = Ticket::all();
@@ -20,11 +22,11 @@ class TicketController extends Controller
     {
 
         try {
-            
             $now = time(); 
             $start1978 = strtotime('1978-01-01 00:00:00'); 
             $secondsSince1978 = $now - $start1978;
-            $code = 'Ticket-' . $secondsSince1978;
+            
+            $code = 'Ticket-' . $request->nom . '-' . $secondsSince1978 . '-' . uniqid();
     
             $ticket = Ticket::create([
                 'nom'      => $request->nom,
@@ -49,19 +51,23 @@ class TicketController extends Controller
         if (!$ticket) {
             return response()->json(['valid' => false, 'message' => 'Invalide']);
         }
-
+    
         if ($ticket->used) {
             return response()->json(['valid' => false, 'message' => 'Déjà utilisé']);
         }
-
-        $ticket->update(['used' => true]);
-
+    
+        if ($ticket->n_billet > 0) {
+            $ticket->n_billet -= 1;
+        }
+    
+        $ticket->used = true;
+        $ticket->save(); 
+    
         return response()->json([
             'valid' => true,
             'nom' => $ticket->nom,
             'conctat' => $ticket->conctat,
-            'conctat' => $request->conctat,
-            'n_billet' => $request->n_billet,
+            'n_billet' => $ticket->n_billet, 
         ]);
     }
 }
