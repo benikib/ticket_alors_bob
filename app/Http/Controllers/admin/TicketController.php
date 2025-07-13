@@ -31,6 +31,7 @@ class TicketController extends Controller
             $secondsSince1978 = $now - $start1978;
     
             $code = 'Ticket-' . $request->nom . '-' . $secondsSince1978 . '-' . uniqid();
+            $code=Hash::make($code);
     
             $ticket = Ticket::create([
                 'nom'      => $request->nom,
