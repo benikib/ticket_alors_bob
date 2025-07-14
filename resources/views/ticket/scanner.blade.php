@@ -98,43 +98,42 @@
         { deviceId: { exact: deviceId } },
         { fps: 10, qrbox: 250 },
         decodedText => {
-          decodedText => {
-  // Stop le scan immédiatement
-  html5QrCode.stop().then(() => {
-   
-
-    fetch(verifyUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": csrfToken
-      },
-      body: JSON.stringify({ code: decodedText })
-    })
-    .then(response => response.json())
-    .then(data => {
-      result.style.display = "block";
-      if (data.valid) {
-        result.innerHTML = "Accès autorisé";
-        result.classList.remove("bg-red-600");
-        result.classList.add("bg-green-600", "p-5");
-      } else {
-        result.innerHTML = "Accès refusé";
-        result.classList.remove("bg-green-600");
-        result.classList.add("bg-red-600", "p-5");
-      }
-    })
-    .catch(error => {
-      console.error("Erreur lors de l'appel à Laravel :", error);
-    });
-
-  }).catch(err => {
-    console.warn("Erreur lors de l'arrêt du scanner :", err);
-  });
-}
-
         
+          fetch(verifyUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-TOKEN": csrfToken
+            },
+            body: JSON.stringify({ code: decodedText })
+          })
+          .then(response => response.json())
+          .then(data => {
          
+            result.style.display="block"
+
+            if(data.valid){
+            result.innerHTML="Acces autorise"
+            result.classList.add("bg-green-600", "p-5");
+            
+                
+            }else{
+                result.innerHTML="Acces refuse"
+                result.classList.add("bg-red-600", "p-5");
+            }
+          })
+          .catch(error => {
+            console.error("Erreur lors de l'appel à Laravel :", error);
+          });
+        },
+        errorMessage => {
+          console.warn("Erreur scan :", errorMessage);
+        }
+      )
+      .catch(err => {
+        console.error("Impossible de démarrer le scanner :", err);
+        alert("Échec démarrage scanner: " + err);
+      });
     });
   </script>
 </body>
