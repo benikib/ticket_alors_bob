@@ -104,7 +104,7 @@
 
         <button type="submit"
                 class="w-full bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-3 rounded-xl transition duration-200">
-          Procéder au paiement
+          Effectuer l'enregistrement
         </button>
       </form>
     </div>
