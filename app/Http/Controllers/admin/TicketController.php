@@ -76,4 +76,10 @@ class TicketController extends Controller
              'n_billet' => $request->n_billet,
          ]);
      }
+
+
+     public function test (){
+        
+
+     }
 }

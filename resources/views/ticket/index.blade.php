@@ -40,7 +40,7 @@
             <th class="py-3 px-4 text-left">Type</th>
             <th class="py-3 px-4 text-left">QR Code</th>
             <th class="py-3 px-4 text-left">Statut</th>
-            <th class="py-3 px-4 text-left">Action</th>
+            
           </tr>
         </thead>
         <tbody class="text-sm md:text-base">
@@ -52,17 +52,11 @@
               <td class="py-2 px-4">{{ $ticket['conctat'] }}</td>
               <td class="py-2 px-4">{{ $ticket['n_billet'] }} billet(s)</td>
               <td class="py-2 px-4">{{ $ticket['vip'] == 1 ? 'VIP' : 'Standard' }}</td>
-              <td class="py-2 px-4">{{ $ticket['code'] }}</td>
-              <td class="py-2 px-4">{{ $ticket['used'] == 1 ? 'Déjà utilisé' : 'Non scanné' }}</td>
               <td class="py-2 px-4">
-                <a href="#" class="text-blue underline open-qr" data-code="{{ $ticket['code'] }}">
-                  Télécharger
-                </a>
-
-                <a  class="text-red-200" >
-                  Supprimer
-                </a>
+                <div class="qr-mini cursor-pointer" data-code="{{ $ticket['code'] }}"></div>
               </td>
+              <td class="py-2 px-4">{{ $ticket['used'] == 1 ? 'Déjà utilisé' : 'Non scanné' }}</td>
+             
             </tr>
             @php $total++; @endphp
           @endforeach
@@ -116,7 +110,7 @@
     </div>
   </div>
 
-  <!-- Modal QR Code -->
+  <!-- Modal QR Code agrandi -->
   <div id="qrModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-60 z-50">
     <div class="bg-white rounded-2xl flex flex-col items-center justify-center shadow-2xl w-full max-w-md mx-auto p-6 sm:p-8 relative text-center">
       <button id="closeQrModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl font-bold">
@@ -131,75 +125,85 @@
     </div>
   </div>
 
-  <!-- Script pour modals -->
+  <!-- Script -->
   <script>
-    // Modal achat
-    const modal = document.getElementById('modal');
-    const openBtns = document.querySelectorAll('.open-modal');
-    const closeModal = document.getElementById('closeModal');
+   document.addEventListener('DOMContentLoaded', () => {
+  // Déclaration des modals
+  const modal = document.getElementById('modal');
+  const qrModal = document.getElementById('qrModal');
+  const qrCodeDiv = document.getElementById('qrcode');
+  const downloadBtn = document.getElementById('downloadQr');
+  const closeModal = document.getElementById('closeModal');
+  const closeQrBtn = document.getElementById('closeQrModal');
 
-    openBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      });
+  // === QR mini dans le tableau ===
+  document.querySelectorAll('.qr-mini').forEach(el => {
+    const code = el.dataset.code;
+    new QRCode(el, {
+      text: code,
+      width: 60,
+      height: 60,
+      correctLevel: QRCode.CorrectLevel.H
     });
 
-    closeModal.addEventListener('click', () => {
+    el.addEventListener('click', () => {
+      qrCodeDiv.innerHTML = "";
+
+      const qr = new QRCode(qrCodeDiv, {
+        text: code,
+        width: 200,
+        height: 200
+      });
+
+      setTimeout(() => {
+        const canvas = qrCodeDiv.querySelector('canvas');
+        if (canvas) {
+          const dataUrl = canvas.toDataURL("image/png");
+          downloadBtn.href = dataUrl;
+          downloadBtn.download = `${code}.png`;
+        }
+      }, 300);
+
+      qrModal.classList.remove('hidden');
+      qrModal.classList.add('flex');
+    });
+  });
+
+  // === Ouverture modal Enregistrement ===
+  document.querySelectorAll('.open-modal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    });
+  });
+
+  // === Fermeture modal Enregistrement ===
+  closeModal.onclick = () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  };
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal) {
       modal.classList.add('hidden');
       modal.classList.remove('flex');
-    });
+    }
+  });
 
-    modal.addEventListener('click', e => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-    });
+  // === Fermeture modal QR code ===
+  closeQrBtn.onclick = () => {
+    qrModal.classList.add('hidden');
+    qrModal.classList.remove('flex');
+  };
 
-    // Modal QR Code
-    const qrModal = document.getElementById('qrModal');
-    const qrCodeDiv = document.getElementById('qrcode');
-    const closeQrBtn = document.getElementById('closeQrModal');
-    const downloadBtn = document.getElementById('downloadQr');
-
-    document.querySelectorAll('.open-qr').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const code = link.getAttribute('data-code');
-
-        qrCodeDiv.innerHTML = "";
-
-        const qr = new QRCode(qrCodeDiv, {
-          text: code,
-          width: 200,
-          height: 200
-        });
-
-        setTimeout(() => {
-          const canvas = qrCodeDiv.querySelector('canvas');
-          if (canvas) {
-            const dataUrl = canvas.toDataURL("image/png");
-            downloadBtn.href = dataUrl;
-          }
-        }, 300);
-
-        qrModal.classList.remove('hidden');
-        qrModal.classList.add('flex');
-      });
-    });
-
-    closeQrBtn.addEventListener('click', () => {
+  qrModal.addEventListener('click', e => {
+    if (e.target === qrModal) {
       qrModal.classList.add('hidden');
       qrModal.classList.remove('flex');
-    });
+    }
+  });
+});
 
-    qrModal.addEventListener('click', e => {
-      if (e.target === qrModal) {
-        qrModal.classList.add('hidden');
-        qrModal.classList.remove('flex');
-      }
-    });
   </script>
 
 </body>
