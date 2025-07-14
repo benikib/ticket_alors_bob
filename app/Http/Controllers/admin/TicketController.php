@@ -56,30 +56,40 @@ class TicketController extends Controller
   
      public function verify(Request $request)
      {
-         $ticket = Ticket::where('code', $request->code)->first();
- 
+         // On cherche directement un ticket non utilisé avec le code haché
+         $ticket = Ticket::where('used', false)
+                         ->where('code', $request->code)
+                         ->first();
+     
+         // Si aucun ticket ne correspond
          if (!$ticket) {
-             return response()->json(['valid' => false, 'message' => 'Invalide']);
+             return response()->json([
+                 'valid' => false,
+                 'message' => 'Code invalide'
+             ], 404);
          }
- 
-         if ($ticket->used) {
-             return response()->json(['valid' => false, 'message' => 'Déjà utilisé']);
+     
+         // Traitement selon le nombre de billets restants
+         if ($ticket->n_billet > 1) {
+             $ticket->decrement('n_billet');
+             $message = 'Billet validé';
+         } else {
+             $ticket->update([
+                 'used' => true,
+                 'n_billet' => 0
+             ]);
+             $message = 'Dernier billet utilisé';
          }
- 
-         $ticket->update(['used' => true]);
- 
+     
+         // Réponse
          return response()->json([
-             'valid' => true,
+             'valid' => $ticket->used,
              'nom' => $ticket->nom,
              'conctat' => $ticket->conctat,
-             'conctat' => $request->conctat,
-             'n_billet' => $request->n_billet,
+             'n_billet' => $ticket->n_billet,
+             'vip' => $ticket->vip,
+             'message' => $message
          ]);
      }
 
-
-     public function test (){
-        
-
-     }
 }

@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QR Code Scanner (Desktop)</title>
 
-  <!-- ✅ CSRF Token -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <!-- Tailwind CSS & QR Scanner -->
@@ -53,6 +52,8 @@
     const select = document.getElementById('cameraList');
     const startBtn = document.getElementById('startBtn');
     const verifyUrl = "{{ route('ticket.verify') }}";
+    alert(verifyUrl);
+    
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
     
 
