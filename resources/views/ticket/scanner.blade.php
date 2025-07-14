@@ -104,7 +104,9 @@
           .then(res => res.json())
           .then(data => {
             result.style.display = "block";
-            result.innerHTML = data.valid ? "Accès autorisé" : "Accès refusé";
+            let nBillet = parseInt(data.n_billet);
+            let reste = nBillet === 1 ? "dernier billet" : `reste ${nBillet} billet(s)`;
+            result.innerHTML = data.valid ? `Accès autorisé (${reste})` : "Accès refusé";
             result.classList.add(data.valid ? "bg-green-600" : "bg-red-600", "p-5");
           })
           .catch(err => {
