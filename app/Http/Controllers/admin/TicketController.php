@@ -83,7 +83,7 @@ class TicketController extends Controller
      
          // Réponse
          return response()->json([
-             'valid' => $ticket->used,
+             'valid' => true,
              'nom' => $ticket->nom,
              'conctat' => $ticket->conctat,
              'n_billet' => $ticket->n_billet,
