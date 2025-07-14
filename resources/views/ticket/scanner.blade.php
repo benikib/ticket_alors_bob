@@ -48,57 +48,51 @@
   </div>
 
   <script>
-    const result = document.getElementById('result');
-    const select = document.getElementById('cameraList');
-    const startBtn = document.getElementById('startBtn');
-    const verifyUrl = "{{ route('ticket.verify') }}";
-    alert(verifyUrl);
-    
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
-    
+  const result = document.getElementById('result');
+  const select = document.getElementById('cameraList');
+  const startBtn = document.getElementById('startBtn');
+  const verifyUrl = "{{ route('ticket.verify') }}";
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
 
-    let html5QrCode;
+  let html5QrCode;
+  let isScanning = false; // 🔒 Pour bloquer les multiples lectures
 
-    // Charger la liste des caméras
-    Html5Qrcode.getCameras()
-      .then(cameras => {
-        if (!cameras || cameras.length === 0) {
-          alert("Aucune caméra détectée.");
-          return;
-        }
-        cameras.forEach(cam => {
-          const opt = document.createElement('option');
-          opt.value = cam.id;
-          opt.text = cam.label || cam.id;
-          select.appendChild(opt);
-        });
-      })
-      .catch(err => {
-        console.error("Erreur getCameras():", err);
-        alert("Erreur d'accès à la caméra : " + err);
-      });
+  // Charger les caméras
+  Html5Qrcode.getCameras().then(cameras => {
+    if (cameras.length === 0) {
+      alert("Aucune caméra trouvée.");
+      return;
+    }
+    cameras.forEach(cam => {
+      const opt = document.createElement('option');
+      opt.value = cam.id;
+      opt.text = cam.label || cam.id;
+      select.appendChild(opt);
+    });
+  }).catch(err => {
+    alert("Erreur accès caméra : " + err);
+  });
 
-    // Bouton "Démarrer le scan"
-    startBtn.addEventListener('click', () => {
-      const deviceId = select.value;
-      if (!deviceId) {
-        alert("Veuillez sélectionner une caméra.");
-        return;
-      }
+  // Démarrer le scan
+  startBtn.addEventListener('click', () => {
+    const deviceId = select.value;
+    if (!deviceId) return alert("Sélectionnez une caméra");
 
-      if (html5QrCode) {
-        html5QrCode.stop().catch(() => {}).finally(() => {
-          html5QrCode.clear();
-        });
-      }
+    result.style.display = "none";
+    result.classList.remove("bg-green-600", "bg-red-600", "p-5");
+    isScanning = false; // Reset le verrou
 
-      html5QrCode = new Html5Qrcode("reader");
+    html5QrCode = new Html5Qrcode("reader");
 
-      html5QrCode.start(
-        { deviceId: { exact: deviceId } },
-        { fps: 10, qrbox: 250 },
-        decodedText => {
-        
+    html5QrCode.start(
+      { deviceId: { exact: deviceId } },
+      { fps: 10, qrbox: 250 },
+      decodedText => {
+        if (isScanning) return;
+        isScanning = true;
+
+        html5QrCode.stop().then(() => {
+          // Appel Laravel pour vérifier le code
           fetch(verifyUrl, {
             method: "POST",
             headers: {
@@ -107,34 +101,26 @@
             },
             body: JSON.stringify({ code: decodedText })
           })
-          .then(response => response.json())
+          .then(res => res.json())
           .then(data => {
-         
-            result.style.display="block"
-
-            if(data.valid){
-            result.innerHTML="Acces autorise"
-            result.classList.add("bg-green-600", "p-5");
-            
-                
-            }else{
-                result.innerHTML="Acces refuse"
-                result.classList.add("bg-red-600", "p-5");
-            }
+            result.style.display = "block";
+            result.innerHTML = data.valid ? "Accès autorisé" : "Accès refusé";
+            result.classList.add(data.valid ? "bg-green-600" : "bg-red-600", "p-5");
           })
-          .catch(error => {
-            console.error("Erreur lors de l'appel à Laravel :", error);
+          .catch(err => {
+            console.error("Erreur vérification :", err);
+            alert("Erreur serveur");
           });
-        },
-        errorMessage => {
-          console.warn("Erreur scan :", errorMessage);
-        }
-      )
-      .catch(err => {
-        console.error("Impossible de démarrer le scanner :", err);
-        alert("Échec démarrage scanner: " + err);
-      });
+        });
+      },
+      error => {
+        console.warn("Échec scan :", error);
+      }
+    ).catch(err => {
+      alert("Impossible de lancer le scanner : " + err);
     });
-  </script>
+  });
+</script>
+
 </body>
 </html>
