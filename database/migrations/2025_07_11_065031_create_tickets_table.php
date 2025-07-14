@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nom');
             $table->integer('n_billet');
+            $table->integer('n_billet_reel');
             $table->string('conctat');
             $table->string('code')->unique();
             $table->boolean('used')->default(false);

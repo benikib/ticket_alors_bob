@@ -26,12 +26,14 @@ class TicketController extends Controller
         $rawCode = 'Ticket-' . $request->nom . '-' . $secondsSince1978 . '-' . uniqid();
         $rawCode=Hash::make($rawCode);
 
+      
         $ticket = Ticket::create([
-            'nom' => $request->nom,
-            'conctat' => $request->conctat,
+            'nom'      => $request->nom,
+            'conctat'  => $request->conctat,
             'n_billet' => $request->n_billet,
-            'vip' => $request->vip ,
-            'code' => $rawCode , // stocke le hash
+            'n_billet_reel' => $request->n_billet,
+            'vip'      => $request->vip, 
+            'code'     => $code,
         ]);
 
         return response()->json([

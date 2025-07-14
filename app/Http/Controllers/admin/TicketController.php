@@ -38,6 +38,7 @@ class TicketController extends Controller
                 'nom'      => $request->nom,
                 'conctat'  => $request->conctat,
                 'n_billet' => $request->n_billet,
+                'n_billet_reel' => $request->n_billet,
                 'vip'      => $request->vip, 
                 'code'     => $code,
             ]);
