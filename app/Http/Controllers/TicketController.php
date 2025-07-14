@@ -33,7 +33,7 @@ class TicketController extends Controller
             'n_billet' => $request->n_billet,
             'n_billet_reel' => $request->n_billet,
             'vip'      => $request->vip, 
-            'code'     => $code,
+            'code'     => $rawCode,
         ]);
 
         return response()->json([
