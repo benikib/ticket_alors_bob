@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
-
 use Illuminate\Http\Request;
 use App\Models\Ticket;
 use Str;
@@ -25,8 +24,6 @@ class TicketController extends Controller
         $secondsSince1978 = $now - $start1978;
         $rawCode = 'Ticket-' . $request->nom . '-' . $secondsSince1978 . '-' . uniqid();
         $rawCode=Hash::make($rawCode);
-
-      
         $ticket = Ticket::create([
             'nom'      => $request->nom,
             'conctat'  => $request->conctat,

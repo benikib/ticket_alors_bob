@@ -14,18 +14,22 @@
   <!-- Header -->
   <header class="bg-orange-600 text-white p-4 shadow flex justify-between items-center flex-wrap gap-2">
     <h1 class="text-xl md:text-2xl font-bold">🎫 Interface Admin – Billets</h1>
+    
     <a href="{{ route('ticket.scanne') }}" 
-       class="bg-white text-red-600 px-4 py-2 rounded shadow hover:bg-gray-100 transition text-sm md:text-base">
-       Scanner un billet
+      class="bg-white text-red-600 px-4 py-2 rounded shadow hover:bg-gray-100 transition text-sm md:text-base flex items-center gap-2">
+      <img src="{{ asset('images/qr-scan.png') }}" alt="Scanner" class="w-10 h-10">
+      Scanner
     </a>
+
   </header>
 
   <!-- Contenu principal -->
   <main class="p-4 md:p-6 container mx-auto">
     <div class="flex items-center justify-around gap-4">
       <h2 class="text-xl font-semibold mb-4 text-center md:text-left">Liste des billets</h2>
+     
       <a class="bg-white open-modal text-red-600 px-4 py-2 mb-3 rounded shadow hover:bg-gray-100 transition text-sm md:text-base">
-        Enregistrement
+      <img src="{{ asset('images/enregistrement.png') }}" alt="Scanner" class="w-10 h-10">
       </a>
     </div>
 

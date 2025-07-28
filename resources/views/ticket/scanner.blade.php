@@ -17,21 +17,20 @@
     <a href="{{ route('ticket.index') }}" 
        class="bg-white text-red-600 px-4 py-2 rounded shadow hover:bg-gray-100 transition text-sm md:text-base">
       Retour
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
     </a>
   </header>
 
   <div class="p-4 space-y-6 max-w-4xl mx-auto border flex flex-col items-center bg-white rounded-lg">
     <h1 class="text-2xl sm:text-3xl font-semibold text-gray-800 text-center">
-      Scanner le code QR
+    <img src="{{ asset('images/codeQr.jpg') }}" alt="Scanner" class="w-24 h-24">
     </h1>
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
-      <select id="cameraList"
-              class="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-blue-400">
-      </select>
+      <input type="text" id="id_camera" class="hidden">
     </div>
 
-    <div class="flex justify-center">
+    <div class="flex justify-center border-orange-500">
       <div id="reader" class="w-64 h-64 sm:w-72 sm:h-72 bg-white rounded-lg shadow-md overflow-hidden"></div>
     </div>
     
@@ -50,6 +49,7 @@
   <script>
   const result = document.getElementById('result');
   const select = document.getElementById('cameraList');
+  const id_camera=document.getElementById('id_camera')
   const startBtn = document.getElementById('startBtn');
   const verifyUrl = "{{ route('ticket.verify') }}";
   const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
@@ -63,24 +63,27 @@
       alert("Aucune caméra trouvée.");
       return;
     }
-    cameras.forEach(cam => {
-      const opt = document.createElement('option');
-      opt.value = cam.id;
-      opt.text = cam.label || cam.id;
-      select.appendChild(opt);
-    });
+
+    const backCamera = cameras.find(cam => 
+    cam.label.toLowerCase().includes("back") || 
+    cam.label.toLowerCase().includes("environment")
+  );
+
+  const cameraIdToUse = backCamera ? backCamera.id : cameras[0].id;
+  id_camera.value=cameraIdToUse;
+
   }).catch(err => {
     alert("Erreur accès caméra : " + err);
   });
 
   // Démarrer le scan
   startBtn.addEventListener('click', () => {
-    const deviceId = select.value;
-    if (!deviceId) return alert("Sélectionnez une caméra");
+    const deviceId = id_camera.value;
+   
 
     result.style.display = "none";
     result.classList.remove("bg-green-600", "bg-red-600", "p-5");
-    isScanning = false; // Reset le verrou
+    isScanning = false; 
 
     html5QrCode = new Html5Qrcode("reader");
 
