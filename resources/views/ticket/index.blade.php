@@ -55,7 +55,12 @@
     </div>
 
     <div class="overflow-x-auto">
-      <table class="min-w-full bg-white rounded-xl shadow overflow-hidden">
+        <div class="mb-4">
+          <input type="text" id="searchInput" placeholder="Rechercher un billet..."
+                class="w-full md:w-1/2 p-3 border  rounded-xl 
+                ">
+        </div>
+        <table class="min-w-full bg-white rounded-xl shadow overflow-hidden">
         <thead class="bg-blue-800 text-white text-sm md:text-base">
           <tr>
             <th class="py-3 px-4 text-left">#</th>
@@ -294,6 +299,21 @@ let nomClientQR = "client";
         }
       });
     });
+//flitrage
+    document.getElementById('searchInput').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+        const nom = row.children[1].textContent.toLowerCase();
+        const numero = row.children[2].textContent.toLowerCase();
+        const billet = row.children[3].textContent.toLowerCase();
+        const type = row.children[5].textContent.toLowerCase();
+
+        const match = nom.includes(searchValue) || numero.includes(searchValue) || billet.includes(searchValue) || type.includes(searchValue);
+        row.style.display = match ? '' : 'none';
+    });
+});
 </script>
 
 
