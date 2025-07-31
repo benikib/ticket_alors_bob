@@ -9,13 +9,29 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
+
+@if ($errors->any())
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    });
+</script>
+@endif
+
+@if (session('success'))
+    <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+        {{ session('success') }}
+    </div>
+@endif
 <body class="bg-gray-100 text-gray-800 font-sans">
 
   <!-- Header -->
   <header class="bg-orange-600 text-white p-4 shadow flex justify-between items-center flex-wrap gap-2">
-    <h1 class="text-xl md:text-2xl font-bold">🎫 Interface Admin – Billets</h1>
+    <h1 class="text-xl md:text-2xl font-bold"> Interface Admin – Billets</h1>
     
-    <a href="{{ route('ticket.scanne') }}" 
+    <a href="{{ route('billet.scanne') }}" 
       class="bg-white text-red-600 px-4 py-2 rounded shadow hover:bg-gray-100 transition text-sm md:text-base flex items-center gap-2">
       <img src="{{ asset('images/qr-scan.png') }}" alt="Scanner" class="w-10 h-10">
       Scanner
@@ -39,29 +55,32 @@
           <tr>
             <th class="py-3 px-4 text-left">#</th>
             <th class="py-3 px-4 text-left">Nom</th>
-            <th class="py-3 px-4 text-left">Contact</th>
-            <th class="py-3 px-4 text-left">Nombre</th>
-            <th class="py-3 px-4 text-left">Type</th>
-            <th class="py-3 px-4 text-left">QR Code</th>
+            <th class="py-3 px-4 text-left">Numero Telephone</th>
+            <th class="py-3 px-4 text-left">Numero du billet</th>
+            <th class="py-3 px-4 text-left">Nombre de billet</th>
+            <th class="py-3 px-4 text-left">Type de billet</th>
+            
             <th class="py-3 px-4 text-left">Statut</th>
+            <th class="py-3 px-4 text-left">QR Code</th>
             
           </tr>
         </thead>
+ 
         <tbody class="text-sm md:text-base">
           @php $total = 1; @endphp
-          @foreach($tickets as $ticket)
-            <tr class="border-b hover:bg-gray-50">
-              <td class="py-2 px-4">{{ $total }}</td>
-              <td class="py-2 px-4">{{ $ticket['nom'] }}</td>
-              <td class="py-2 px-4">{{ $ticket['conctat'] }}</td>
-              <td class="py-2 px-4">{{ $ticket['n_billet'] }} billet(s)</td>
-              <td class="py-2 px-4">{{ $ticket['vip'] == 1 ? 'VIP' : 'Standard' }}</td>
-              <td class="py-2 px-4">
-                <div class="qr-mini cursor-pointer" data-code="{{ $ticket['code'] }}"></div>
-              </td>
-              <td class="py-2 px-4">{{ $ticket['used'] == 1 ? 'Déjà utilisé' : 'Non scanné' }}</td>
-             
-            </tr>
+          @foreach($billets as $billet)
+          <tr class="border-b hover:bg-gray-50">
+                  <td class="py-2 px-4">{{ $total}}</td>
+                  <td class="py-2 px-4">{{ $billet->nom_complet_client }}</td>
+                  <td class="py-2 px-4">{{ $billet->numero_client }}</td>
+                  <td class="py-2 px-4">{{ $billet->numero_billet }}</td>
+                  <td class="py-2 px-4">{{ $billet->nombre_reel }} billet(s)</td>
+                  <td class="py-2 px-4">{{ $billet->typeBillet->nom_type_billet ?? 'N/A' }}</td>
+                  <td class="py-2 px-4">{{ $billet->statut_billet }} </td>
+                  <td class="py-2 px-4">
+                    <div class="qr-mini cursor-pointer" data-nom="{{ $billet['nom_complet_client'] }}" data-code="{{ $billet['code_bilet'] }}"></div>
+                  </td>
+          </tr>
             @php $total++; @endphp
           @endforeach
         </tbody>
@@ -76,33 +95,52 @@
         &times;
       </button>
       <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">Finalisez votre achat</h2>
-
-      <form id="paymentForm" class="space-y-5" method="post" action="{{ route('ticket.store') }}">
+      
+      <form id="paymentForm" class="space-y-5" method="post" action="{{ route('billet.store') }}">
         @csrf
         <div>
           <label for="fullname" class="block text-sm font-medium text-gray-700">Nom complet</label>
-          <input type="text" id="fullname" name="nom" required
+          <input type="text" id="fullname" name="nom_complet_client" required
                  class="mt-1 border block w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3" />
         </div>
 
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Téléphone (082...)</label>
-          <input type="tel" id="email" name="conctat" required
+          <input type="tel" id="email" name="numero_client" required
                  class="mt-1 block border w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3" />
         </div>
 
         <div>
           <label for="quantity" class="block text-sm font-medium text-gray-700">Nombre de tickets</label>
-          <input type="number" id="quantity" name="n_billet" min="1" value="1" required
+          <input type="number" readonly id="quantity" name="nombre_reel" min="1" value="1" required
+                 class="mt-1 border  block w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3" />
+        </div>
+
+        <div>
+
+          <label for="numero_billet" class="block text-sm font-medium text-gray-700">Numero du billet</label>
+          <input type="text" id="numero_billet" name="numero_billet" min="1" value="1" required
                  class="mt-1 border block w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3" />
+                 @error('numero_billet')
+                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                @enderror
+        </div>
+
+        <div>
+          <label for="ticketType" class="block text-sm font-medium text-gray-700">Devise</label>
+          <select id="ticketType" name="devise" required
+                  class="mt-1 border block w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3">
+            <option value="usd">USD</option>
+            <option value="cdf">CDF</option>
+          </select>
         </div>
 
         <div>
           <label for="ticketType" class="block text-sm font-medium text-gray-700">Type de billet</label>
-          <select id="ticketType" name="vip" required
+          <select id="ticketType" name="type_billet" required
                   class="mt-1 border block w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3">
-            <option value="0">Standard – 5 000 FC</option>
-            <option value="1">VIP – 10 $</option>
+            <option value="standard">Standard – 5 000 FC</option>
+            <option value="vip">VIP – 10 $</option>
           </select>
         </div>
 
@@ -122,93 +160,137 @@
       </button>
       <h2 class="text-xl font-bold mb-4">QR Code du billet</h2>
       <div id="qrcode" class="mx-auto mb-4"></div>
-      <a id="downloadQr" href="#" download="billet.png"
+      <!-- <a id="downloadQr" href="#" download="billet.png"
          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block">
         Télécharger
-      </a>
+      </a> -->
+      <button onclick="telecharger()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Télécharger le code</button>
     </div>
   </div>
 
   <!-- Script -->
-  <script>
-   document.addEventListener('DOMContentLoaded', () => {
-  // Déclaration des modals
-  const modal = document.getElementById('modal');
-  const qrModal = document.getElementById('qrModal');
-  const qrCodeDiv = document.getElementById('qrcode');
-  const downloadBtn = document.getElementById('downloadQr');
-  const closeModal = document.getElementById('closeModal');
-  const closeQrBtn = document.getElementById('closeQrModal');
+  <!-- Ajoute ce script dans ton HTML -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  // === QR mini dans le tableau ===
-  document.querySelectorAll('.qr-mini').forEach(el => {
-    const code = el.dataset.code;
-    new QRCode(el, {
-      text: code,
-      width: 60,
-      height: 60,
-      correctLevel: QRCode.CorrectLevel.H
-    });
+<script>
 
-    el.addEventListener('click', () => {
-      qrCodeDiv.innerHTML = "";
+let nomClientQR = "client";
+    function telecharger() {
+      const canvas = document.querySelector('#qrcode canvas');
 
-      const qr = new QRCode(qrCodeDiv, {
-        text: code,
-        width: 200,
-        height: 200
+      if (!canvas) {
+        alert("QR Code non généré !");
+        return;
+      }
+
+      const imgData = canvas.toDataURL("image/png");
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const qrWidth = 100;
+      const x = (pageWidth - qrWidth) / 2;
+      const y = 40;
+
+      // Fond coloré (rectangle arrondi)
+      pdf.setFillColor(230, 240, 255);
+      pdf.roundedRect(x - 10, y - 10, qrWidth + 20, qrWidth + 20, 8, 8, 'F');
+
+      // Titre
+      pdf.setFontSize(18);
+      pdf.setTextColor(50, 50, 120);
+      pdf.text("Bienvenu au spectacle de bob", pageWidth / 2, 25, { align: "center" });
+
+      // QR Code
+      pdf.addImage(imgData, "PNG", x, y, qrWidth, qrWidth);
+
+      // Texte sous le QR
+      pdf.setFontSize(12);
+      pdf.setTextColor(80, 80, 80);
+      pdf.text("ALORS BOB", pageWidth / 2, y + qrWidth + 25, { align: "center" });
+
+      pdf.save(`billet-de-${nomClientQR}.pdf`);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('modal');
+      const qrModal = document.getElementById('qrModal');
+      const qrCodeDiv = document.getElementById('qrcode');
+      const downloadBtn = document.getElementById('downloadQr');
+      const closeModal = document.getElementById('closeModal');
+      const closeQrBtn = document.getElementById('closeQrModal');
+
+      document.querySelectorAll('.qr-mini').forEach(el => {
+        const code = el.dataset.code;
+        new QRCode(el, {
+          text: code,
+          width: 60,
+          height: 60,
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        el.addEventListener('click', () => {
+          qrCodeDiv.innerHTML = "";
+
+          nomClientQR = el.dataset.nom?.replace(/\s+/g, '-').toLowerCase() || "client";
+
+          const qr = new QRCode(qrCodeDiv, {
+            text: code,
+            width: 200,
+            height: 200
+          });
+
+          // Attendre que le canvas soit prêt sans setTimeout
+          const interval = setInterval(() => {
+            const canvas = qrCodeDiv.querySelector('canvas');
+            if (canvas) {
+              clearInterval(interval);
+              const dataUrl = canvas.toDataURL("image/png");
+              downloadBtn.href = dataUrl;
+              downloadBtn.download = `${code}.png`;
+            }
+          }, 100);
+
+          qrModal.classList.remove('hidden');
+          qrModal.classList.add('flex');
+        });
       });
 
-      setTimeout(() => {
-        const canvas = qrCodeDiv.querySelector('canvas');
-        if (canvas) {
-          const dataUrl = canvas.toDataURL("image/png");
-          downloadBtn.href = dataUrl;
-          downloadBtn.download = `${code}.png`;
+      // Modal Enregistrement
+      document.querySelectorAll('.open-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        });
+      });
+
+      closeModal.onclick = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      };
+
+      modal.addEventListener('click', e => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
         }
-      }, 300);
+      });
 
-      qrModal.classList.remove('hidden');
-      qrModal.classList.add('flex');
+      closeQrBtn.onclick = () => {
+        qrModal.classList.add('hidden');
+        qrModal.classList.remove('flex');
+      };
+
+      qrModal.addEventListener('click', e => {
+        if (e.target === qrModal) {
+          qrModal.classList.add('hidden');
+          qrModal.classList.remove('flex');
+        }
+      });
     });
-  });
+</script>
 
-  // === Ouverture modal Enregistrement ===
-  document.querySelectorAll('.open-modal').forEach(btn => {
-    btn.addEventListener('click', () => {
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    });
-  });
-
-  // === Fermeture modal Enregistrement ===
-  closeModal.onclick = () => {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  };
-
-  modal.addEventListener('click', e => {
-    if (e.target === modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-  });
-
-  // === Fermeture modal QR code ===
-  closeQrBtn.onclick = () => {
-    qrModal.classList.add('hidden');
-    qrModal.classList.remove('flex');
-  };
-
-  qrModal.addEventListener('click', e => {
-    if (e.target === qrModal) {
-      qrModal.classList.add('hidden');
-      qrModal.classList.remove('flex');
-    }
-  });
-});
-
-  </script>
 
 </body>
 </html>
