@@ -10,15 +10,20 @@
 </head>
 
 
-@if ($errors->any())
+@if ($errors->any() || session('error'))
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('modal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal?.classList.remove('hidden');
+        modal?.classList.add('flex');
+
+        @if (session('error'))
+            alert("{{ session('error') }}");
+        @endif
     });
 </script>
 @endif
+
 
 @if (session('success'))
     <div class="bg-green-100 text-green-700 p-3 rounded mb-4">

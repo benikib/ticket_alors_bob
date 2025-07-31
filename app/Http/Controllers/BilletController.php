@@ -39,14 +39,22 @@ class BilletController extends Controller
     
         // Étape 2 : recherche des modèles associés
         $type_billet = Type_billet::where('nom_type_billet', $validated['type_billet'])->first();
+        if (!$type_billet) {
+            return redirect()->back()->with('error', 'Type de billet introuvable.');
+        }
+        
+        if ($type_billet->quantite_disponible < $request->nombre_reel) {
+            return redirect()->back()->with('error', 'Quantité insuffisante de billets disponibles.');
+        }
+
         $tarif = Tarif::where('type_billet_id', $type_billet->id)
                       ->where('devise', $validated['devise'])
                       ->first();
     
         if (!$tarif) {
-            return response()->json(['error' => 'Tarif introuvable'], 404);
+            return redirect()->back()->with('error', 'Tarif introuvable.');
         }
-    
+
         try {
             // Génération du code unique
             $now = time(); 
@@ -66,6 +74,8 @@ class BilletController extends Controller
                 'type_billet_id'     => $type_billet->id,
                 'tarif_id'           => $tarif->id,
             ]);
+            $type_billet->quantite_disponible -= $request->nombre_reel;
+            $type_billet->save();
     
             return redirect()->route('billet.index')->with('success', 'Billet enregistré avec succès.');
 

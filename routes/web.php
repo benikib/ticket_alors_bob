@@ -5,12 +5,11 @@ use App\Http\Controllers\admin\TicketController;
 use App\Http\Controllers\BilletController;
 use App\Services\MpesaService;
 
+use App\Http\Controllers\api\mobileMoneyController;
 
 
-Route::get('tickets/', [TicketController::class, 'index'])->name("ticket.index");
-Route::post('tickets/', [TicketController::class, 'store'])->name("ticket.store");
-Route::get('/ticket/scanne', [TicketController::class, 'scanne'])->name("ticket.scanne");
-Route::post('/ticket/verify', [TicketController::class, 'verify'])->name("ticket.verify");
+
+Route::get('mobileMoney/send', [mobileMoneyController::class, 'sendPayment'])->name("mobileMoney.send");
 
 Route::get('/', [BilletController::class, 'index'])->name("billet.index");
 Route::get('billet/', [BilletController::class, 'index'])->name("billet.index");
