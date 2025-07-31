@@ -200,7 +200,7 @@ let nomClientQR = "client";
       // Titre
       pdf.setFontSize(18);
       pdf.setTextColor(50, 50, 120);
-      pdf.text("Bienvenu au spectacle de bob", pageWidth / 2, 25, { align: "center" });
+      pdf.text("Bienvenu au spectacle de bob, "+nomClientQR, pageWidth / 2, 25, { align: "center" });
 
       // QR Code
       pdf.addImage(imgData, "PNG", x, y, qrWidth, qrWidth);
