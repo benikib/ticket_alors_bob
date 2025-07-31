@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\api;
 
 use Illuminate\Http\Request;
+use Str;
+use App\Models\Billet;
+use App\Models\Tarif;
+use App\Models\Type_billet;
 
 class BilletController extends Controller
 {
