@@ -6,5 +6,4 @@ use App\Http\Controllers\api\BilletController;
 
 
 
-
 Route::post('/billets', [BilletController::class, 'store']);

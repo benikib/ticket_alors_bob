@@ -1,7 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\api;
+use App\Http\Controllers\Controller;    // <--- import Controller de base Laravel
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Str;
 use App\Models\Billet;
