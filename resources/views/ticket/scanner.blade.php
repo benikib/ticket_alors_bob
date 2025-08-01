@@ -13,10 +13,19 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start  space-y-6">
 
+<!-- Modal résultat -->
+<div id="resultModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-60 z-50">
+  <div class="bg-white rounded-xl p-6 max-w-md mx-auto text-center">
+    <h2 class="text-2xl font-bold mb-4">Résultat du scan</h2>
+    <p id="resultMessage" class="text-lg mb-4 text-gray-700"></p>
+    <button id="okBtn" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">OK</button>
+  </div>
+</div>
+
+
   <header class="bg-orange-600 text-white p-4 shadow flex justify-between items-center flex-wrap gap-2 w-full">
     <a href="{{ route('billet.index') }}" 
        class="bg-white text-red-600 px-4 py-2 rounded shadow hover:bg-gray-100 transition text-sm md:text-base">
-      Retour
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
     </a>
   </header>
@@ -45,6 +54,14 @@
   </div>
 
   <script>
+
+let isShowingResult = false;
+const resultModal = document.getElementById('resultModal');
+const resultMessage = document.getElementById('resultMessage');
+const okBtn = document.getElementById('okBtn');
+
+
+
   const result = document.getElementById('result');
   const select = document.getElementById('cameraList');
   const id_camera=document.getElementById('id_camera')
@@ -76,57 +93,61 @@
 
   // Démarrer le scan
   startBtn.addEventListener('click', () => {
-    const deviceId = id_camera.value;
-   
+  const deviceId = id_camera.value;
+  isShowingResult = false;
 
-    result.style.display = "none";
-    result.classList.remove("bg-green-600", "bg-red-600", "p-5");
-    isScanning = false; 
+  result.style.display = "none";
+  result.classList.remove("bg-green-600", "bg-red-600", "p-5");
 
-    html5QrCode = new Html5Qrcode("reader");
+  const html5QrCode = new Html5Qrcode("reader");
 
-    html5QrCode.start(
-      { deviceId: { exact: deviceId } },
-      { fps: 10, qrbox: 250 },
-      decodedText => {
-        if (isScanning) return;
-        isScanning = true;
+  html5QrCode.start(
+    { deviceId: { exact: deviceId } },
+    { fps: 10, qrbox: 250 },
+    decodedText => {
+      if (isShowingResult) return;
+      isShowingResult = true;
 
-        html5QrCode.stop().then(() => {
-          // Appel Laravel pour vérifier le code
-          fetch(verifyUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRF-TOKEN": csrfToken
-            },
-            body: JSON.stringify({ code: decodedText })
-          })
-          .then(res => res.json())
-          .then(data => {
-            result.style.display = "block";
-            
-            let occurance = parseInt(data.occurance_billet);
-            let reste = occurance === 0 ? "Billet épuisé" : `Reste ${occurance} billet(s)`;
+      fetch(verifyUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrfToken
+        },
+        body: JSON.stringify({ code: decodedText })
+      })
+      .then(res => res.json())
+      .then(data => {
+        let occurance = parseInt(data.occurance_billet);
+        let reste = occurance === 0 ? "Billet épuisé" : `Reste ${occurance} billet(s)`;
 
-            result.innerHTML = data.valid ? `✅ Accès autorisé (${reste})` : "❌ Accès refusé";
-            result.classList.remove("bg-green-600", "bg-red-600"); // Nettoie d’abord
-            result.classList.add(data.valid ? "bg-green-600" : "bg-red-600", "p-5");
-          })
-          .catch(err => {
-            console.error("Erreur vérification :", err);
-            alert("Erreur serveur");
-          });
+        const message = data.valid 
+          ? `✅ Accès autorisé<br>${reste}` 
+          : `❌ Accès refusé`;
 
-        });
-      },
-      error => {
-        console.warn("Échec scan :", error);
-      }
-    ).catch(err => {
-      alert("Impossible de lancer le scanner : " + err);
-    });
+        resultMessage.innerHTML = message;
+        resultModal.classList.remove("hidden");
+        resultModal.classList.add("flex");
+      })
+      .catch(err => {
+        alert("Erreur serveur");
+        console.error(err);
+        isShowingResult = false;
+      });
+    },
+    error => {
+      // Pas bloquant
+    }
+  ).catch(err => {
+    alert("Impossible de démarrer le scanner : " + err);
   });
+
+  okBtn.addEventListener('click', () => {
+    resultModal.classList.add("hidden");
+    resultModal.classList.remove("flex");
+    isShowingResult = false; // autoriser un autre scan
+  });
+});
 </script>
 
 </body>
