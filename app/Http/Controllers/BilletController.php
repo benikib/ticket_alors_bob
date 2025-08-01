@@ -26,7 +26,7 @@ class BilletController extends Controller
         $validated = $request->validate([
             'nom_complet_client' => 'required|string|max:255',
             'numero_client'      => 'required|string|max:20',
-            'numero_billet'      => 'required|string|max:50|unique:billets,numero_billet',
+            'numero_billet'      => 'string',
             'type_billet'        => 'required|string',
             'devise'             => 'required|string|in:usd,cdf', 
             'nombre_reel'        => 'required|integer|min:1',
@@ -68,7 +68,7 @@ class BilletController extends Controller
                 'nom_complet_client' => $validated['nom_complet_client'],
                 'numero_client'      => $validated['numero_client'],
                 'numero_billet'      => $validated['numero_billet'],
-                'code_bilet'         => $code,
+                'code_bilet'         => "",
                 'occurance_billet'   => $validated['nombre_reel'],
                 'nombre_reel'        => $validated['nombre_reel'],
                 'type_billet_id'     => $type_billet->id,

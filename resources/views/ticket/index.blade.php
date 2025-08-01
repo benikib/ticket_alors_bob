@@ -66,7 +66,7 @@
             <th class="py-3 px-4 text-left">#</th>
             <th class="py-3 px-4 text-left">Nom</th>
             <th class="py-3 px-4 text-left">Numero Telephone</th>
-            <th class="py-3 px-4 text-left">Numero du billet</th>
+            <th class="py-3 px-4 text-left">Moyen d'achat</th>
             <th class="py-3 px-4 text-left">Nombre de billet</th>
             <th class="py-3 px-4 text-left">Type de billet</th>
             
@@ -83,10 +83,16 @@
                   <td class="py-2 px-4">{{ $total}}</td>
                   <td class="py-2 px-4">{{ $billet->nom_complet_client }}</td>
                   <td class="py-2 px-4">{{ $billet->numero_client }}</td>
-                  <td class="py-2 px-4">{{ $billet->numero_billet }}</td>
+                  <td class="py-2 px-4">{{ $billet->moyen_achat }}</td>
                   <td class="py-2 px-4">{{ $billet->nombre_reel }} billet(s)</td>
                   <td class="py-2 px-4">{{ $billet->typeBillet->nom_type_billet ?? 'N/A' }}</td>
-                  <td class="py-2 px-4">{{ $billet->statut_billet }} </td>
+                  <td class="py-2 px-4">
+                    @if($billet->moyen_achat === 'en_ligne')
+                      {{ $billet->statut_billet }}
+                    @else
+                      —
+                    @endif
+                  </td>
                   <td class="py-2 px-4">
                     <div class="qr-mini cursor-pointer" data-nom="{{ $billet['nom_complet_client'] }}" data-code="{{ $billet['code_bilet'] }}"></div>
                   </td>
@@ -122,11 +128,11 @@
 
         <div>
           <label for="quantity" class="block text-sm font-medium text-gray-700">Nombre de tickets</label>
-          <input type="number" readonly id="quantity" name="nombre_reel" min="1" value="1" required
+          <input type="number"  id="quantity" name="nombre_reel" required
                  class="mt-1 border  block w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3" />
         </div>
 
-        <div>
+        <div style="display: none;">
 
           <label for="numero_billet" class="block text-sm font-medium text-gray-700">Numero du billet</label>
           <input type="text" id="numero_billet" name="numero_billet" min="1" value="1" required
