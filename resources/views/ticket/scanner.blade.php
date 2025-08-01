@@ -93,6 +93,7 @@ const okBtn = document.getElementById('okBtn');
 
   // Démarrer le scan
   startBtn.addEventListener('click', () => {
+    startBtn.style.display = "none";
   const deviceId = id_camera.value;
   isShowingResult = false;
 
@@ -122,8 +123,8 @@ const okBtn = document.getElementById('okBtn');
         let reste = occurance === 0 ? "Billet épuisé" : `Reste ${occurance} billet(s)`;
 
         const message = data.valid 
-          ? `✅ Accès autorisé<br>${reste}` 
-          : `❌ Accès refusé`;
+            ? `✅ <strong>${data.nom}</strong><br>Accès autorisé<br>${reste}` 
+            : `❌ <strong></strong><br>Accès refusé`;
 
         resultMessage.innerHTML = message;
         resultModal.classList.remove("hidden");
