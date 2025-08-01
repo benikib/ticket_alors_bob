@@ -84,7 +84,7 @@
                   <td class="py-2 px-4">{{ $billet->nom_complet_client }}</td>
                   <td class="py-2 px-4">{{ $billet->numero_client }}</td>
                   <td class="py-2 px-4">{{ $billet->moyen_achat }}</td>
-                  <td class="py-2 px-4">{{ $billet->nombre_reel }} billet(s)</td>
+                  <td class="py-2 px-4">{{ $billet->occurance_billet }} billet(s)</td>
                   <td class="py-2 px-4">{{ $billet->typeBillet->nom_type_billet ?? 'N/A' }}</td>
                   <td class="py-2 px-4">
                     @if($billet->moyen_achat === 'en_ligne')
