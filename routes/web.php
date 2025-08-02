@@ -18,9 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::post('billet/verify', [BilletController::class, 'verify'])->name("billet.verify");
 
     Route::post('logout', [AuthController::class, 'logout'])->name("login.logout");
+    Route::get('/', [BilletController::class, 'index']);
 });
 
-Route::get('/', [AuthController::class, 'login']);
+
 Route::get('login', [AuthController::class, 'login'])->name("login");
 Route::post('login', [AuthController::class, 'toLogin'])->name("login.toLogin");
 

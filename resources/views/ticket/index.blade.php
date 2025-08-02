@@ -70,18 +70,18 @@
 @if(Auth::user()->role !== 'user')
 <div class="grid grid-cols-1 gap-4 max-w-5xl mx-auto px-4 mt-6">
   <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg">
-    <h3 class="text-sm sm:text-base font-bold text-gray-700 mb-4 uppercase tracking-wide">Détail par type de billet</h3>
+    <h3 class="text-sm sm:text-base font-bold text-gray-700 mb-4 uppercase tracking-wide">Information sur les billets</h3>
 
     <div class="overflow-x-auto rounded-lg border border-gray-200">
       <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
         <thead class="bg-gray-100 text-gray-600 uppercase">
           <tr>
-            <th class="px-4 py-3">Type</th>
-            <th class="px-4 py-3">En ligne</th>
-            <th class="px-4 py-3">Guichet</th>
-            <th class="px-4 py-3">Montant USD</th>
-            <th class="px-4 py-3">Montant CDF</th>
-            <th class="px-4 py-3">Total billet(s)</th>
+            <th class="px-4 py-4">Type</th>
+            <th class="px-4 py-4">En ligne</th>
+            <th class="px-4 py-4">Guichet</th>
+            <th class="px-4 py-4">Montant USD</th>
+            <th class="px-4 py-4">Montant CDF</th>
+            <th class="px-4 py-4">Total billet(s)</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -216,6 +216,8 @@
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Téléphone (082...)</label>
           <input type="tel" id="email" name="numero_client" required
+          placeholder="+243xxxxxxxxx"
+          pattern="^\+243\d{9}$"
                  class="mt-1 block border w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3" />
         </div>
 
