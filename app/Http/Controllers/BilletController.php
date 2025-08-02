@@ -16,7 +16,7 @@ class BilletController extends Controller
     {
         $billets = Billet::with(['typeBillet', 'tarif'])->get();
     
-        $totalBillets = $billets->sum('occurance_billet');
+        $totalBillets = $billets->sum('nombre_reel');
     
         // Initialisation des stats
         $montantLigneUSD = $montantLigneCDF = 0;

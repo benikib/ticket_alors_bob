@@ -311,7 +311,12 @@ let nomClientQR = "client";
       // Titre
       pdf.setFontSize(18);
       pdf.setTextColor(50, 50, 120);
-      pdf.text("Bienvenu au spectacle de bob, "+nomClientQR, pageWidth / 2, 25, { align: "center" });
+       
+     
+
+      pdf.text("Ceci est votre Billet en code QR");
+
+
 
       // QR Code
       pdf.addImage(imgData, "PNG", x, y, qrWidth, qrWidth);
@@ -319,7 +324,7 @@ let nomClientQR = "client";
       // Texte sous le QR
       pdf.setFontSize(12);
       pdf.setTextColor(80, 80, 80);
-      pdf.text("ALORS BOB", pageWidth / 2, y + qrWidth + 25, { align: "center" });
+      pdf.text("Bienvenu.e au Spectacle de ALORS BOB , "+nomClientQR, pageWidth / 2, y + qrWidth + 25, { align: "center" });
 
       pdf.save(`billet-de-${nomClientQR}.pdf`);
     }
