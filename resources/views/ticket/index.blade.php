@@ -142,6 +142,7 @@
             <th class="py-3 px-4 text-left">Moyen d'achat</th>
             <th class="py-3 px-4 text-left">Nombre de billet acheté</th>
             <th class="py-3 px-4 text-left">Nombre de billet valide</th>
+            <th class="py-3 px-4 text-left">Date d'achat</th>
             <th class="py-3 px-4 text-left">Type de billet</th>
 
             <th class="py-3 px-4 text-left">Statut</th>
@@ -149,7 +150,6 @@
             <th class="py-3 px-4 text-left">QR Code</th>
             @endif
 
-            
           </tr>
         </thead>
  
@@ -184,11 +184,15 @@
                       <span class="text-gray-400">—</span>
                     @endif
                   </td>
+                  <td class="py-2 px-4">{{ $billet->created_at ? $billet->created_at->format('d/m/Y') : 'N/A' }}</td>
+
                   @if(Auth::user()->role !== 'user')
                   <td class="py-2 px-4">
                     <div class="qr-mini cursor-pointer" data-nom="{{ $billet['nom_complet_client'] }}" data-code="{{ $billet['code_bilet'] }}"></div>
                   </td>
                   @endif
+                  
+                  
           </tr>
             @php $total++; @endphp
           @endforeach
@@ -323,7 +327,7 @@ let nomClientQR = "client";
       // Texte sous le QR
       pdf.setFontSize(12);
       pdf.setTextColor(80, 80, 80);
-      pdf.text("Bienvenu.e au Spectacle de ALORS BOB , "+nomClientQR, pageWidth / 2, y + qrWidth + 25, { align: "center" });
+      pdf.text("Bienvenu.e au Spectacle  ALORS BOB , "+nomClientQR, pageWidth / 2, y + qrWidth + 25, { align: "center" });
 
       pdf.save(`billet-de-${nomClientQR}.pdf`);
     }
