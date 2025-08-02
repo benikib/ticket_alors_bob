@@ -114,7 +114,7 @@ class mobileMoneyController extends Controller
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Erreur lors de l’appel à Maishapay.',
+                    'message' => 'Une erreur inattendue est survenue',
                     'error' => $response->body(),
                 ], $response->status());
             }

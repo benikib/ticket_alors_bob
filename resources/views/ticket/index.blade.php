@@ -250,8 +250,8 @@
           <label for="ticketType" class="block text-sm font-medium text-gray-700">Type de billet</label>
           <select id="ticketType" name="type_billet" required
                   class="mt-1 border block w-full rounded-xl border-gray-300 shadow-sm focus:ring-red-500 focus:border-red-500 p-3">
-            <option value="standard">Standard – 5 000 FC</option>
-            <option value="vip">VIP – 10 $</option>
+            <option value="standard">Standard – 5 000 FC (2$)</option>
+            <option value="vip">VIP – 10 $ (29000 FC)</option>
           </select>
         </div>
 
