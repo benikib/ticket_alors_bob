@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-
 use App\Models\Billet;
 use App\Models\Tarif;
 use App\Models\Type_billet;
@@ -59,9 +58,9 @@ class mobileMoneyController extends Controller
             // Payload pour Maishapay
             $payload = [
                 'transactionReference' => $data['transactionReference'],
-                'gatewayMode' => "0",
-                'publicApiKey' => env('MAISHAPAY_PUBLIC_KEY_TEST'),
-                'secretApiKey' => env('MAISHAPAY_SECRET_KEY_TEST'),
+                'gatewayMode' => "1",
+                'publicApiKey' => env('MAISHAPAY_PUBLIC_KEY_PROD'),
+                'secretApiKey' => env('MAISHAPAY_SECRET_KEY_PROD'),
                 'order' => [
                     'amount' => $data['amount'],
                     'currency' => $data['currency'],
@@ -107,7 +106,7 @@ class mobileMoneyController extends Controller
     
                 return response()->json([
                     'status' => true,
-                    'message' => 'Paiement envoyé avec succès.',
+                    'message' => 'Paiement effectue avec succès.',
                     'data' => $response->json(),
                     'billet' => $billet
                 ]);
