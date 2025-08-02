@@ -50,7 +50,7 @@ class mobileMoneyController extends Controller
                 'amount'               => $tarif->prix * $request->nombre_reel,
                 'currency'             => $request->devise,
                 'customerFullName'     => $request->nom_complet_client,
-                'customerEmailAdress'  => 'jean.dupont@example.com',
+                'customerEmailAdress'  => 'menji@example.com',
                 'provider'             => $request->service,
                 'walletID'             => $request->numero_client,
                 'callbackUrl'          => 'https://tondomaine.com/mobile_callback',
@@ -59,9 +59,9 @@ class mobileMoneyController extends Controller
             // Payload pour Maishapay
             $payload = [
                 'transactionReference' => $data['transactionReference'],
-                'gatewayMode' => "0",
-                'publicApiKey' => env('MAISHAPAY_PUBLIC_KEY_TEST'),
-                'secretApiKey' => env('MAISHAPAY_SECRET_KEY_TEST'),
+                'gatewayMode' => "1",
+                'publicApiKey' => env('MAISHAPAY_PUBLIC_KEY_PROD'),
+                'secretApiKey' => env('MAISHAPAY_SECRET_KEY_PROD'),
                 'order' => [
                     'amount' => $data['amount'],
                     'currency' => $data['currency'],
