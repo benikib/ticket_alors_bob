@@ -142,10 +142,11 @@
             <th class="py-3 px-4 text-left">Moyen d'achat</th>
             <th class="py-3 px-4 text-left">Nombre de billet acheté</th>
             <th class="py-3 px-4 text-left">Nombre de billet valide</th>
-            <th class="py-3 px-4 text-left">Date d'achat</th>
+            
             <th class="py-3 px-4 text-left">Type de billet</th>
 
             <th class="py-3 px-4 text-left">Statut</th>
+            <th class="py-3 px-4 text-left">Date d'achat</th>
             @if(Auth::user()->role !== 'user')
             <th class="py-3 px-4 text-left">QR Code</th>
             @endif
