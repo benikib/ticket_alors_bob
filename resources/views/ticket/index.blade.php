@@ -33,16 +33,69 @@
 <body class="bg-gray-100 text-gray-800 font-sans">
 
   <!-- Header -->
-  <header class="bg-orange-600 text-white p-4 shadow flex justify-between items-center flex-wrap gap-2">
-    <h1 class="text-xl md:text-2xl font-bold"> Interface Admin – Billets</h1>
-    
+  <header class="bg-orange-600 text-white px-6 py-4 shadow-md flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+  <!-- Titre principal -->
+  <h1 class="text-2xl font-bold text-center md:text-left">Interface Gestion Billets</h1>
+
+  <!-- Partie droite : utilisateur, logout, bouton scanner -->
+  <div class="flex items-center gap-4 flex-wrap justify-center md:justify-end">
+    @if(Auth::check())
+      <!-- Bonjour + nom -->
+      <div class="bg-white text-orange-700 px-4 py-1.5 rounded-xl shadow text-sm font-medium flex items-center gap-2">
+        <strong>{{ Auth::user()->role }}</strong>
+      </div>
+
+      <!-- Bouton déconnexion -->
+      <form method="POST" action="{{ route('login.logout') }}">
+        @csrf
+        <button type="submit"
+                class="bg-white text-red-600 hover:bg-gray-100 transition px-4 py-2 rounded-xl shadow text-sm font-semibold">
+          🔓 Se déconnecter
+        </button>
+      </form>
+    @endif
+
+    <!-- Bouton Scanner -->
     <a href="{{ route('billet.scanne') }}" 
-      class="bg-white text-red-600 px-4 py-2 rounded shadow hover:bg-gray-100 transition text-sm md:text-base flex items-center gap-2">
-      <img src="{{ asset('images/qr-scan.png') }}" alt="Scanner" class="w-10 h-10">
+       class="flex items-center gap-2 bg-white text-blue-700 hover:bg-gray-100 transition px-4 py-2 rounded-xl shadow text-sm font-semibold">
+      <img src="{{ asset('images/qr-scan.png') }}" alt="Scanner" class="w-8 h-8">
       Scanner
     </a>
+  </div>
+</header>
 
-  </header>
+<!-- Dashboard Statistiques -->
+<div class="grid grid-cols-1 mt-4 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6 max-w-5xl mx-auto px-4">
+  <!-- Total billets -->
+  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-blue-500 flex flex-col justify-center">
+    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Billets enregistrés</h3>
+    <p class="text-xl sm:text-2xl font-bold text-blue-800">{{ $totalBillets }}</p>
+  </div>
+
+  <!-- Montant en ligne -->
+  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-green-500 flex flex-col justify-center">
+    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Montant (achat en ligne)</h3>
+    <p class="text-base sm:text-lg text-green-700 font-semibold">USD : {{ number_format($montantLigneUSD, 2, ',', ' ') }} $</p>
+    <p class="text-base sm:text-lg text-green-700 font-semibold">CDF : {{ number_format($montantLigneCDF, 0, ',', ' ') }} FC</p>
+  </div>
+
+  <!-- Montant au guichet -->
+  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-yellow-500 flex flex-col justify-center">
+    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Montant (achat au guichet)</h3>
+    <p class="text-base sm:text-lg text-yellow-700 font-semibold">USD : {{ number_format($montantGuichetUSD, 2, ',', ' ') }} $</p>
+    <p class="text-base sm:text-lg text-yellow-700 font-semibold">CDF : {{ number_format($montantGuichetCDF, 0, ',', ' ') }} FC</p>
+  </div>
+
+  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-red-500 flex flex-col justify-center">
+    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Montant Total</h3>
+    <p class="text-base sm:text-lg text-red-700 font-semibold">USD : {{ number_format($totalUSD, 2, ',', ' ') }} $</p>
+    <p class="text-base sm:text-lg text-red-700 font-semibold">CDF : {{ number_format($totalCDF, 0, ',', ' ') }} FC</p>
+  </div>
+</div>
+
+
+
+
 
   <!-- Contenu principal -->
   <main class="p-4 md:p-6 container mx-auto">

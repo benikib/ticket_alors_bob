@@ -12,13 +12,57 @@ use Illuminate\Http\Request;
 class BilletController extends Controller
 {
 
-    public function index(){
-      
+    public function index()
+    {
         $billets = Billet::with(['typeBillet', 'tarif'])->get();
-       
-        return View("ticket.index",["billets"=>$billets]);
-        
-     }
+    
+        $totalBillets = $billets->sum('nombre_reel');
+    
+        // Initialisation
+        $montantGuichetUSD = 0;
+        $montantGuichetCDF = 0;
+        $montantLigneUSD = 0;
+        $montantLigneCDF = 0;
+    
+        foreach ($billets as $billet) {
+            $nombre = $billet->nombre_reel ?? 1; // nombre de billets
+            $tarif = $billet->tarif;
+    
+            if ($tarif) {
+                $montant = $tarif->prix * $nombre;
+    
+                if ($billet->moyen_achat === 'en_ligne') {
+                    if ($tarif->devise === 'usd') {
+                        $montantLigneUSD += $montant;
+                    } elseif ($tarif->devise === 'cdf') {
+                        $montantLigneCDF += $montant;
+                    }
+                } elseif ($billet->moyen_achat === 'guichet') {
+                    if ($tarif->devise === 'usd') {
+                        $montantGuichetUSD += $montant;
+                    } elseif ($tarif->devise === 'cdf') {
+                        $montantGuichetCDF += $montant;
+                    }
+                }
+            }
+        }
+    
+        // Montant total
+        $totalUSD = $montantGuichetUSD + $montantLigneUSD;
+        $totalCDF = $montantGuichetCDF + $montantLigneCDF;
+    
+        return view("ticket.index", [
+            "billets" => $billets,
+            "totalBillets" => $totalBillets,
+            "montantGuichetUSD" => $montantGuichetUSD,
+            "montantGuichetCDF" => $montantGuichetCDF,
+            "montantLigneUSD" => $montantLigneUSD,
+            "montantLigneCDF" => $montantLigneCDF,
+            "totalUSD" => $totalUSD,
+            "totalCDF" => $totalCDF,
+        ]);
+    }
+    
     //
     public function store(Request $request)
     {
