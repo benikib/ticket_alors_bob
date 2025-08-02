@@ -314,8 +314,7 @@ let nomClientQR = "client";
        
      
 
-      pdf.text("Ceci est votre Billet en code QR");
-
+      pdf.text("Ceci est votre Billet en code QR",pageWidth / 2, 25, { align: "center" });
 
 
       // QR Code
