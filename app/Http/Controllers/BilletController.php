@@ -16,52 +16,69 @@ class BilletController extends Controller
     {
         $billets = Billet::with(['typeBillet', 'tarif'])->get();
     
-        $totalBillets = $billets->sum('nombre_reel');
+        $totalBillets = $billets->sum('occurance_billet');
     
-        // Initialisation
-        $montantGuichetUSD = 0;
-        $montantGuichetCDF = 0;
-        $montantLigneUSD = 0;
-        $montantLigneCDF = 0;
+        // Initialisation des stats
+        $montantLigneUSD = $montantLigneCDF = 0;
+        $montantGuichetUSD = $montantGuichetCDF = 0;
+    
+        $billetsParType = []; 
     
         foreach ($billets as $billet) {
-            $nombre = $billet->nombre_reel ?? 1; // nombre de billets
-            $tarif = $billet->tarif;
+            $occurence = $billet->nombre_reel;
+            $montant = $occurence * ($billet->tarif->prix ?? 0);
+            $devise = $billet->tarif->devise ?? null;
+            $typeNom = $billet->typeBillet->nom_type_billet ?? 'Inconnu';
+            $moyen = $billet->moyen_achat;
     
-            if ($tarif) {
-                $montant = $tarif->prix * $nombre;
+            // Init le type si pas encore fait
+            if (!isset($billetsParType[$typeNom])) {
+                $billetsParType[$typeNom] = [
+                    'total' => 0,
+                    'en_ligne' => 0,
+                    'guichet' => 0,
+                    'usd' => 0,
+                    'cdf' => 0,
+                ];
+            }
     
-                if ($billet->moyen_achat === 'en_ligne') {
-                    if ($tarif->devise === 'usd') {
-                        $montantLigneUSD += $montant;
-                    } elseif ($tarif->devise === 'cdf') {
-                        $montantLigneCDF += $montant;
-                    }
-                } elseif ($billet->moyen_achat === 'guichet') {
-                    if ($tarif->devise === 'usd') {
-                        $montantGuichetUSD += $montant;
-                    } elseif ($tarif->devise === 'cdf') {
-                        $montantGuichetCDF += $montant;
-                    }
+            // Ajout du nombre de billets
+            $billetsParType[$typeNom]['total'] += $occurence;
+            $billetsParType[$typeNom][$moyen] += $occurence;
+    
+            // Ajout du montant
+            if ($devise === 'usd') {
+                if ($moyen === 'en_ligne') {
+                    $montantLigneUSD += $montant;
+                } else {
+                    $montantGuichetUSD += $montant;
                 }
+                $billetsParType[$typeNom]['usd'] += $montant;
+            }
+    
+            if ($devise === 'cdf') {
+                if ($moyen === 'en_ligne') {
+                    $montantLigneCDF += $montant;
+                } else {
+                    $montantGuichetCDF += $montant;
+                }
+                $billetsParType[$typeNom]['cdf'] += $montant;
             }
         }
     
-        // Montant total
-        $totalUSD = $montantGuichetUSD + $montantLigneUSD;
-        $totalCDF = $montantGuichetCDF + $montantLigneCDF;
-    
-        return view("ticket.index", [
-            "billets" => $billets,
-            "totalBillets" => $totalBillets,
-            "montantGuichetUSD" => $montantGuichetUSD,
-            "montantGuichetCDF" => $montantGuichetCDF,
-            "montantLigneUSD" => $montantLigneUSD,
-            "montantLigneCDF" => $montantLigneCDF,
-            "totalUSD" => $totalUSD,
-            "totalCDF" => $totalCDF,
+        return view('ticket.index', [
+            'billets'            => $billets,
+            'totalBillets'       => $totalBillets,
+            'montantLigneUSD'    => $montantLigneUSD,
+            'montantLigneCDF'    => $montantLigneCDF,
+            'montantGuichetUSD'  => $montantGuichetUSD,
+            'montantGuichetCDF'  => $montantGuichetCDF,
+            'totalUSD'           => $montantLigneUSD + $montantGuichetUSD,
+            'totalCDF'           => $montantLigneCDF + $montantGuichetCDF,
+            'billetsParType'     => $billetsParType,
         ]);
     }
+    
     
     //
     public function store(Request $request)

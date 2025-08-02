@@ -65,33 +65,52 @@
 </header>
 
 <!-- Dashboard Statistiques -->
-<div class="grid grid-cols-1 mt-4 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6 max-w-5xl mx-auto px-4">
-  <!-- Total billets -->
-  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-blue-500 flex flex-col justify-center">
-    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Billets enregistrés</h3>
-    <p class="text-xl sm:text-2xl font-bold text-blue-800">{{ $totalBillets }}</p>
-  </div>
+<!-- Détails par type de billet -->
 
-  <!-- Montant en ligne -->
-  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-green-500 flex flex-col justify-center">
-    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Montant (achat en ligne)</h3>
-    <p class="text-base sm:text-lg text-green-700 font-semibold">USD : {{ number_format($montantLigneUSD, 2, ',', ' ') }} $</p>
-    <p class="text-base sm:text-lg text-green-700 font-semibold">CDF : {{ number_format($montantLigneCDF, 0, ',', ' ') }} FC</p>
-  </div>
+@if(Auth::user()->role !== 'user')
+<div class="grid grid-cols-1 gap-4 max-w-5xl mx-auto px-4 mt-6">
+  <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg">
+    <h3 class="text-sm sm:text-base font-bold text-gray-700 mb-4 uppercase tracking-wide">Détail par type de billet</h3>
 
-  <!-- Montant au guichet -->
-  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-yellow-500 flex flex-col justify-center">
-    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Montant (achat au guichet)</h3>
-    <p class="text-base sm:text-lg text-yellow-700 font-semibold">USD : {{ number_format($montantGuichetUSD, 2, ',', ' ') }} $</p>
-    <p class="text-base sm:text-lg text-yellow-700 font-semibold">CDF : {{ number_format($montantGuichetCDF, 0, ',', ' ') }} FC</p>
-  </div>
-
-  <div class="bg-white p-4 rounded-lg shadow text-center border-l-4 border-red-500 flex flex-col justify-center">
-    <h3 class="text-xs sm:text-sm text-gray-500 uppercase tracking-wide mb-1">Montant Total</h3>
-    <p class="text-base sm:text-lg text-red-700 font-semibold">USD : {{ number_format($totalUSD, 2, ',', ' ') }} $</p>
-    <p class="text-base sm:text-lg text-red-700 font-semibold">CDF : {{ number_format($totalCDF, 0, ',', ' ') }} FC</p>
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200 text-sm text-left">
+        <thead class="bg-gray-100 text-gray-600 uppercase">
+          <tr>
+            <th class="px-4 py-3">Type</th>
+            <th class="px-4 py-3">En ligne</th>
+            <th class="px-4 py-3">Guichet</th>
+            <th class="px-4 py-3">Montant USD</th>
+            <th class="px-4 py-3">Montant CDF</th>
+            <th class="px-4 py-3">Total billet(s)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @foreach($billetsParType as $type => $stats)
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-2 font-semibold text-blue-700">{{ $type }}</td>
+              <td class="px-4 py-2 text-green-700 font-semibold">{{ $stats['en_ligne'] }} billet(s)</td>
+              <td class="px-4 py-2 text-yellow-600 font-semibold">{{ $stats['guichet'] }} billet(s)</td>
+              <td class="px-4 py-2 text-green-700 font-semibold">${{ number_format($stats['usd'], 2, ',', ' ') }}</td>
+              <td class="px-4 py-2 text-yellow-700 font-semibold">{{ number_format($stats['cdf'], 0, ',', ' ') }} FC</td>
+              <td class="px-4 py-2">{{ $stats['total'] }} billet(s)</td>
+            </tr>
+          @endforeach
+        </tbody>
+        <tfoot>
+          <tr class="bg-gray-100 font-bold">
+            <td class="px-4 py-3 text-right" colspan="3">Total général :</td>
+            <td class="px-4 py-3 text-green-700">${{ number_format($totalUSD, 2, ',', ' ') }}</td>
+            <td class="px-4 py-3 text-yellow-700">{{ number_format($totalCDF, 0, ',', ' ') }} FC</td>
+            <td class="px-4 py-3 text-blue-800">{{ $totalBillets }} billet(s)</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </div>
 </div>
+@endif
+
+
 
 
 
@@ -101,10 +120,11 @@
   <main class="p-4 md:p-6 container mx-auto">
     <div class="flex items-center justify-around gap-4">
       <h2 class="text-xl font-semibold mb-4 text-center md:text-left">Liste des billets</h2>
-     
+      @if(Auth::user()->role !== 'user')
       <a class="bg-white open-modal text-red-600 px-4 py-2 mb-3 rounded shadow hover:bg-gray-100 transition text-sm md:text-base">
       <img src="{{ asset('images/enregistrement.png') }}" alt="Scanner" class="w-10 h-10">
       </a>
+      @endif
     </div>
 
     <div class="overflow-x-auto">
@@ -120,11 +140,15 @@
             <th class="py-3 px-4 text-left">Nom</th>
             <th class="py-3 px-4 text-left">Numero Telephone</th>
             <th class="py-3 px-4 text-left">Moyen d'achat</th>
-            <th class="py-3 px-4 text-left">Nombre de billet</th>
+            <th class="py-3 px-4 text-left">Nombre de billet acheté</th>
+            <th class="py-3 px-4 text-left">Nombre de billet valide</th>
             <th class="py-3 px-4 text-left">Type de billet</th>
-            
+
             <th class="py-3 px-4 text-left">Statut</th>
+            @if(Auth::user()->role !== 'user')
             <th class="py-3 px-4 text-left">QR Code</th>
+            @endif
+
             
           </tr>
         </thead>
@@ -137,18 +161,34 @@
                   <td class="py-2 px-4">{{ $billet->nom_complet_client }}</td>
                   <td class="py-2 px-4">{{ $billet->numero_client }}</td>
                   <td class="py-2 px-4">{{ $billet->moyen_achat }}</td>
-                  <td class="py-2 px-4">{{ $billet->occurance_billet }} billet(s)</td>
+                  <td class="py-2 px-4">{{ $billet->nombre_reel }} billet(s)</td>
+                  <td class="py-2 px-4">
+
+                  @if($billet->moyen_achat === 'en_ligne')
+                      {{ $billet->occurance_billet }}
+                    @else
+                      —
+                    @endif  
+                  </td>
                   <td class="py-2 px-4">{{ $billet->typeBillet->nom_type_billet ?? 'N/A' }}</td>
                   <td class="py-2 px-4">
                     @if($billet->moyen_achat === 'en_ligne')
-                      {{ $billet->statut_billet }}
+                      @if($billet->statut_billet === 'valide')
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Valide</span>
+                      @elseif($billet->statut_billet === 'utiliser')
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Utilisé</span>
+                      @else
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">{{ $billet->statut_billet }}</span>
+                      @endif
                     @else
-                      —
+                      <span class="text-gray-400">—</span>
                     @endif
                   </td>
+                  @if(Auth::user()->role !== 'user')
                   <td class="py-2 px-4">
                     <div class="qr-mini cursor-pointer" data-nom="{{ $billet['nom_complet_client'] }}" data-code="{{ $billet['code_bilet'] }}"></div>
                   </td>
+                  @endif
           </tr>
             @php $total++; @endphp
           @endforeach
