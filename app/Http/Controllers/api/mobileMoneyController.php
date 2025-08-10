@@ -74,7 +74,6 @@ class mobileMoneyController extends Controller
                     'callbackUrl' => $data['callbackUrl'],
                 ],
             ];
-    
             // Envoi de la requête
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -82,41 +81,49 @@ class mobileMoneyController extends Controller
                 'verify' => false,
             ])->post(env('MOBILE_MONEY_URL'), $payload);
     
-            if ($response->successful()) {
+            $responseData = $response->json();
+
+            if (
+                $response->status() === 200 &&
+                isset($responseData['transactionStatus']) &&
+                $responseData['transactionStatus'] === 'SUCCESS'
+            ) {
                 // Génération du code billet sécurisé
                 $now = time();
                 $start1978 = strtotime('1978-01-01 00:00:00');
                 $secondsSince1978 = $now - $start1978;
                 $raw_code = 'Ticket-' . $request->nom_complet_client . '-' . $secondsSince1978 . '-' . uniqid();
                 $code = Hash::make($raw_code);
-    
+
                 // Création du billet
                 $billet = Billet::create([
                     'nom_complet_client' => $request->nom_complet_client,
                     'numero_client'      => $request->numero_client,
-                    'code_bilet'         => $code,
+                    'code_bilet'        => $code, 
                     'occurance_billet'   => $request->nombre_reel,
                     'nombre_reel'        => $request->nombre_reel,
                     'type_billet_id'     => $type_billet->id,
                     'tarif_id'           => $tarif->id,
                     'moyen_achat'        => 'en_ligne'
                 ]);
+
                 $type_billet->quantite_disponible -= $request->nombre_reel;
                 $type_billet->save();
-    
+
                 return response()->json([
                     'status' => true,
-                    'message' => 'Paiement effectue avec succès.',
-                    'data' => $response->json(),
+                    'message' => 'Paiement effectué avec succès.',
+                    'data' => $responseData,
                     'billet' => $billet
                 ]);
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Une erreur inattendue est survenue',
-                    'error' => $response->body(),
-                ], $response->status());
+                    'message' => 'Paiement refusé ou en attente.',
+                    'data' => $responseData
+                ]);
             }
+
         } catch (\Throwable $e) {
             Log::error("Erreur Maishapay: " . $e->getMessage());
             return response()->json([

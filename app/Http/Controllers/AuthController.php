@@ -42,11 +42,15 @@ public function register(Request $request)
 
     public function login()
     {
+
+
+    
        return view('auth.login');
     }
 
     public function toLogin(Request $request)
     {
+     
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
