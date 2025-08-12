@@ -7,6 +7,7 @@ use App\Models\Billet;
 use App\Models\Tarif;
 use App\Models\Type_billet;
 
+
 use Illuminate\Http\Request;
 
 class BilletController extends Controller
@@ -14,6 +15,7 @@ class BilletController extends Controller
 
     public function index()
     {
+     
         $billets = Billet::with(['typeBillet', 'tarif'])->get();
     
         $totalBillets = $billets->sum('nombre_reel');

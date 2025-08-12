@@ -110,12 +110,6 @@
 </div>
 @endif
 
-
-
-
-
-
-
   <!-- Contenu principal -->
   <main class="p-4 md:p-6 container mx-auto">
     <div class="flex items-center justify-around gap-4">

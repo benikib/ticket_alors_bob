@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\api;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -75,7 +74,7 @@ class mobileMoneyController extends Controller
                 ],
             ];
             // Envoi de la requête
-            $response = Http::withHeaders([
+            $response = Http::timeout(120)->withHeaders([
                 'Content-Type' => 'application/json',
             ])->withOptions([
                 'verify' => false,
